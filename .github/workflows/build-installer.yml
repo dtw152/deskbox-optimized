@@ -60,6 +60,13 @@ jobs:
         run: |
           .\scripts\publish-aot-retail.ps1 -Platform ${{ inputs.platform }}
 
+      - name: Diagnose repository drift
+        if: failure()
+        shell: pwsh
+        run: |
+          git status --porcelain=v1 -uall | Select-Object -First 80
+          git diff --stat HEAD | Select-Object -First 40
+
       - name: Compile installer
         shell: pwsh
         run: |
