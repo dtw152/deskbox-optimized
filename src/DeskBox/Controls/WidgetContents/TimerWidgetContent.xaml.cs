@@ -37,7 +37,7 @@ public sealed partial class TimerWidgetContent : UserControl
     }
 }
 
-public sealed class TimerBoolToVisibilityConverter : IValueConverter
+public sealed partial class TimerBoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
         => value is true ? Visibility.Visible : Visibility.Collapsed;
@@ -46,7 +46,7 @@ public sealed class TimerBoolToVisibilityConverter : IValueConverter
         => throw new NotSupportedException();
 }
 
-public sealed class TimerInverseBoolToVisibilityConverter : IValueConverter
+public sealed partial class TimerInverseBoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
         => value is true ? Visibility.Collapsed : Visibility.Visible;

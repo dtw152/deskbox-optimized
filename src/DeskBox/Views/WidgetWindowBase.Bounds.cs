@@ -869,10 +869,21 @@ public abstract partial class WidgetWindowBase
 
     // ── Window corner & DWM border ─────────────────────────────
 
+    private string? _lastCornerLogSignature;
+
     protected void ApplyWindowCornerPreference()
     {
         string effectivePreference = WindowsCompatibilityService.ResolveEffectiveWidgetCornerPreference(
             SettingsService.Settings.WidgetCornerPreference);
+        double surfaceRadius = GetCornerRadiusFromPreference();
+        string cornerSignature = $"{effectivePreference}|{surfaceRadius:0.#}";
+        if (!string.Equals(cornerSignature, _lastCornerLogSignature, StringComparison.Ordinal))
+        {
+            _lastCornerLogSignature = cornerSignature;
+            App.Log(
+                $"[Corners] hwnd=0x{HWnd.ToInt64():X} pref={effectivePreference} radius={surfaceRadius:0.#}");
+        }
+
         int cornerPreference;
         if (effectivePreference == SettingsService.WidgetCornerPreferenceCustom)
         {
