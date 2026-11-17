@@ -39,7 +39,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x
+          # 必须和仓库 global.json / packages.lock.json 对齐的精确版本，
+          # 否则 ILLink.Tasks 版本飘移会让锁定还原失败。
+          dotnet-version: 10.0.402
 
       - name: Setup Rust
         shell: pwsh
