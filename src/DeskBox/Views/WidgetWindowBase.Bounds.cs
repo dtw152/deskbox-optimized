@@ -848,6 +848,12 @@ public abstract partial class WidgetWindowBase
         if (args.DidPositionChange || args.DidSizeChange)
         {
             UpdateCustomPanoramaViewport();
+            if (args.DidSizeChange)
+            {
+                ApplyWindowCornerRegion(
+                    WindowsCompatibilityService.ResolveEffectiveWidgetCornerPreference(
+                        SettingsService.Settings.WidgetCornerPreference));
+            }
         }
 
         if (IsApplyingBounds ||
@@ -908,6 +914,67 @@ public abstract partial class WidgetWindowBase
         }
 
         Win32Helper.TrySetDwmWindowAttribute(HWnd, Win32Helper.DWMWA_WINDOW_CORNER_PREFERENCE, ref cornerPreference);
+        ApplyWindowCornerRegion(effectivePreference);
+    }
+
+    /// <summary>
+    /// Windows 10 has no DWM window rounding, so the square window frame would
+    /// paint over any rounded XAML surface and the corner preference looked
+    /// like it did nothing. Clip the whole HWND with a rounded region instead
+    /// so the requested radius (including the custom slider) is visible on
+    /// every supported Windows version.
+    /// </summary>
+    private void ApplyWindowCornerRegion(string effectivePreference)
+    {
+        if (WindowsCompatibilityService.SupportsNativeWindowCorners || HWnd == IntPtr.Zero)
+        {
+            return;
+        }
+
+        double radiusDip = string.Equals(
+            effectivePreference,
+            SettingsService.WidgetCornerPreferenceSquare,
+            StringComparison.Ordinal)
+            ? 0
+            : GetCornerRadiusFromPreference();
+        double scale = _observedRasterizationScale > 0 ? _observedRasterizationScale : 1.0;
+        int ellipseSize = (int)Math.Round(radiusDip * scale * 2);
+
+        if (ellipseSize <= 1)
+        {
+            Win32Helper.SetWindowRgn(HWnd, IntPtr.Zero, true);
+            return;
+        }
+
+        if (!Win32Helper.GetWindowRect(HWnd, out Win32Helper.RECT rect))
+        {
+            return;
+        }
+
+        int width = rect.Right - rect.Left;
+        int height = rect.Bottom - rect.Top;
+        if (width <= 0 || height <= 0)
+        {
+            return;
+        }
+
+        IntPtr region = Win32Helper.CreateRoundRectRgn(
+            0,
+            0,
+            width + 1,
+            height + 1,
+            ellipseSize,
+            ellipseSize);
+        if (region == IntPtr.Zero)
+        {
+            return;
+        }
+
+        // SetWindowRgn takes ownership of the region handle on success.
+        if (Win32Helper.SetWindowRgn(HWnd, region, true) == 0)
+        {
+            Win32Helper.DeleteObject(region);
+        }
     }
 
     protected void ApplyDwmBorderStyle(bool isDark)

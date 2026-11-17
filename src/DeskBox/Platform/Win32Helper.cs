@@ -312,6 +312,21 @@ public static partial class Win32Helper
     [LibraryImport("user32.dll")]
     public static partial uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
+    [LibraryImport("gdi32.dll")]
+    public static partial IntPtr CreateRoundRectRgn(
+        int left,
+        int top,
+        int right,
+        int bottom,
+        int widthEllipse,
+        int heightEllipse);
+
+    [LibraryImport("gdi32.dll")]
+    public static partial int DeleteObject(IntPtr hObject);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    public static partial int SetWindowRgn(IntPtr hWnd, IntPtr hRgn, [MarshalAs(UnmanagedType.Bool)] bool bRedraw);
+
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
