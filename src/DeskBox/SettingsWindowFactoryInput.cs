@@ -57,6 +57,11 @@ internal sealed record SettingsWindowFactoryInput(
                 T,
                 Format,
                 ex => ReportError("[TodoSettings] Update failed:", ex)),
+            new DeskBox.Features.Weather.WeatherSettingsViewModel(
+                FeatureWidgetsSettings,
+                T,
+                Format,
+                ex => ReportError("[WeatherSettings] Update failed:", ex)),
             new SearchSettingsViewModel(
                 SearchSettings,
                 TryEnqueueOnUi,
@@ -85,6 +90,7 @@ internal sealed record SettingsWindowFactoryInput(
             new DeskBox.Features.FileStack.FileStackSettingsViewModel(FileStackSettings, T, Format),
             new DeskBox.Features.GroupNavigation.GroupNavigationSettingsViewModel(GroupNavigationSettings, T),
             new DeskBox.Features.FeatureWidgets.FeatureWidgetsSettingsViewModel(FeatureWidgetsSettings, T),
+            new DeskBox.Features.Music.MusicSettingsViewModel(FeatureWidgetsSettings, T),
             new DeskBox.Features.ManagedStorage.ManagedStorageSettingsViewModel(ManagedStorageSettings, T),
             new DeskBox.Features.Maintenance.MaintenanceSettingsViewModel(MaintenanceSettings),
             new DeskBox.Features.Performance.PerformanceSettingsViewModel(

@@ -173,6 +173,7 @@ public sealed partial class SettingsWindow : Window
 
     public SettingsWindow(SettingsService settingsService, ThemeService themeService, LocalizationService localizationService,
         TodoSettingsViewModel todoSettings,
+        DeskBox.Features.Weather.WeatherSettingsViewModel weatherSettings,
         SearchSettingsViewModel searchSettings,
         BackupSettingsViewModel backupSettings, IBackupRestoreActions backupRestoreActions,
             IQuickCaptureSettings quickCaptureSettings,
@@ -186,6 +187,7 @@ public sealed partial class SettingsWindow : Window
         DeskBox.Features.FileStack.FileStackSettingsViewModel fileStackSettings,
         DeskBox.Features.GroupNavigation.GroupNavigationSettingsViewModel groupNavigationSettings,
         DeskBox.Features.FeatureWidgets.FeatureWidgetsSettingsViewModel featureWidgetsSettings,
+        DeskBox.Features.Music.MusicSettingsViewModel musicSettings,
         DeskBox.Features.ManagedStorage.ManagedStorageSettingsViewModel managedStorageSettings,
         DeskBox.Features.Maintenance.MaintenanceSettingsViewModel maintenanceSettings,
         DeskBox.Features.Performance.PerformanceSettingsViewModel performanceSettings,
