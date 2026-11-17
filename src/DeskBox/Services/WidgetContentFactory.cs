@@ -65,12 +65,16 @@ public sealed class WidgetContentFactory
             "Timer",
             "\uE916",
             WidgetContentStage.Implemented,
-            CanShowInCreateEntry: false,
+            // A plain creatable widget: it lives in the tray "new widget"
+            // menu instead of the feature-widget toggles. The feature path
+            // gates creation on FeatureWidgetSettings.IsEnabled, which
+            // falls back to "a live widget already exists" -> a brand-new
+            // timer could never be created.
+            CanShowInCreateEntry: true,
             WidgetContentAvailability.Available,
             "WidgetContent.Timer.StatusLabel",
             "WidgetContent.Timer.StatusDescription",
             "Timer.Title",
-            IsFeatureWidget: true,
             DefaultChromeMode: WidgetChromeMode.Standard),
         new(
             WidgetKind.Tags,

@@ -1077,8 +1077,12 @@ public sealed partial class WidgetManager
                         new WidgetContentFactory(_localizationService).GetDescriptor(widgetKind)),
                     WidgetKind = widgetKind,
                     BoundsCoordinateVersion = WidgetConfig.CurrentBoundsCoordinateVersion,
-                    Width = _settingsService.Settings.DefaultWidgetWidth,
-                    Height = _settingsService.Settings.DefaultWidgetHeight
+                    Width = widgetKind == WidgetKind.Timer
+                        ? 320
+                        : _settingsService.Settings.DefaultWidgetWidth,
+                    Height = widgetKind == WidgetKind.Timer
+                        ? 420
+                        : _settingsService.Settings.DefaultWidgetHeight
                 };
                 ApplyNewWidgetPlacement(config);
                 await CreateRegisteredWidgetFromConfigAsync(config, revealAfterCreate: true);
@@ -2729,7 +2733,7 @@ public sealed partial class WidgetManager
             WidgetKind.Music => (380, 190),
             WidgetKind.Weather => (200, 200),
             WidgetKind.Glance => (360, 260),
-            WidgetKind.Timer => (240, 220),
+            WidgetKind.Timer => (320, 420),
             _ => (
                 _settingsService.Settings.DefaultWidgetWidth,
                 _settingsService.Settings.DefaultWidgetHeight)

@@ -333,6 +333,11 @@ public sealed class AppearanceSettingsCoordinator : IAppearanceSettings
         }
 
         _settings.Settings.WidgetShell.WidgetCornerRadiusCustom = normalized;
+        // The slider writes a field no SettingsChanged subscriber watches, so
+        // it must stream on the preview channel itself — otherwise dragging
+        // the 0-24 px slider repaints nothing until the app restarts.
+        _settings.RequestAppearancePreview();
+        _settings.SaveDebounced();
         return AppearanceValueUpdate.CommittedValue(normalized);
     }
 
@@ -348,6 +353,9 @@ public sealed class AppearanceSettingsCoordinator : IAppearanceSettings
         WidgetShellSettingsSlice shell = _settings.Settings.WidgetShell;
         if (shell.WidgetBorderColorMode == normalized) return;
         shell.WidgetBorderColorMode = normalized;
+        // Border color/style only change XAML surface brushes, so the repaint
+        // has to ride the preview channel the loaded windows listen to.
+        _settings.RequestAppearancePreview();
         _settings.SaveDebounced();
     }
 
@@ -363,6 +371,7 @@ public sealed class AppearanceSettingsCoordinator : IAppearanceSettings
         WidgetShellSettingsSlice shell = _settings.Settings.WidgetShell;
         if (shell.WidgetBorderStyle == normalized) return;
         shell.WidgetBorderStyle = normalized;
+        _settings.RequestAppearancePreview();
         _settings.SaveDebounced();
     }
 

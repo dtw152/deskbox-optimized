@@ -1,6 +1,7 @@
 using DeskBox.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
 
 namespace DeskBox.Controls.WidgetContents;
 
@@ -20,6 +21,10 @@ public sealed partial class TimerWidgetContent : UserControl
 
     private void Reset_Click(object sender, RoutedEventArgs e) => ViewModel.Reset();
 
+    private void Lap_Click(object sender, RoutedEventArgs e) => ViewModel.RecordLap();
+
+    private void ApplyDuration_Click(object sender, RoutedEventArgs e) => ViewModel.ApplyCustomDuration();
+
     private void Preset_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not FrameworkElement { Tag: string tag } ||
@@ -30,4 +35,22 @@ public sealed partial class TimerWidgetContent : UserControl
 
         ViewModel.SetPreset(minutes);
     }
+}
+
+public sealed class TimerBoolToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+        => value is true ? Visibility.Visible : Visibility.Collapsed;
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+        => throw new NotSupportedException();
+}
+
+public sealed class TimerInverseBoolToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+        => value is true ? Visibility.Collapsed : Visibility.Visible;
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+        => throw new NotSupportedException();
 }

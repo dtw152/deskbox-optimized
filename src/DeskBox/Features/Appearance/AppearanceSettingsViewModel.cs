@@ -1028,6 +1028,14 @@ public sealed partial class AppearanceSettingsViewModel : ObservableObject
                 return;
             }
 
+            // Touching the slider IS the intent: flip the corner mode to
+            // Custom first, otherwise the authored radius stays inert and
+            // only the preset tier is rendered.
+            if (!IsCustomCornerRadiusEnabled)
+            {
+                CornerPreference = WidgetCornerKinds.Custom;
+            }
+
             AppearanceValueUpdate update = _settings.UpdateWidgetCornerRadiusCustom(value);
             if (!update.Committed)
             {
