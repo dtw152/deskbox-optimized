@@ -25,10 +25,6 @@ jobs:
     name: Publish AOT and package installer
     runs-on: windows-latest
     timeout-minutes: 90
-    env:
-      # 官方 CI 同样用锁定还原：避免 restore 改写 packages.lock.json，
-      # 这样 publish-aot-retail.ps1 结束时的“仓库未变化”校验才能通过。
-      RestoreLockedMode: true
 
     steps:
       - name: Checkout

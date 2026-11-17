@@ -171,12 +171,16 @@ function Get-WorkingTreeSnapshot {
         throw "Unable to resolve the repository commit."
     }
 
-    $status = (& git -C $repoRoot status --porcelain=v1 --untracked-files=all) -join "`n"
+    # NuGet 锁定文件会随 SDK 补丁版本与源顺序正常重写（例如 ILLink.Tasks
+    # 10.0.13 -> 10.0.14），这不影响源码完整性，因此从快照里排除，
+    # 否则任何一次 restore 都会让本次发布的“仓库未变化”校验失败。
+    $lockFileExclude = ":(exclude,glob)**/packages*.lock.json"
+    $status = (& git -C $repoRoot status --porcelain=v1 --untracked-files=all -- . $lockFileExclude) -join "`n"
     if ($LASTEXITCODE -ne 0) {
         throw "Unable to capture the repository status."
     }
 
-    $diff = (& git -C $repoRoot diff --no-ext-diff --binary HEAD) -join "`n"
+    $diff = (& git -C $repoRoot diff --no-ext-diff --binary HEAD -- . $lockFileExclude) -join "`n"
     if ($LASTEXITCODE -ne 0) {
         throw "Unable to capture the repository diff."
     }
