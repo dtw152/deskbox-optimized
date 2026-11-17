@@ -1,0 +1,96 @@
+name: Build Installer
+
+# 在 GitHub 的 Windows 机器上把这个改造版编译成可安装的 exe，
+# 不需要你本地装 Visual Studio / .NET 10 / Rust。
+#
+# 用法：
+#   1. 把 DeskBox源码/DeskBox 推到自己的 GitHub 仓库（公开或私有均可）；
+#   2. 仓库 → Actions → "Build Installer" → Run workflow；
+#   3. 跑完在本次运行页面底部下载 Artifact（DeskBox-Installer-x64）。
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "目标平台"
+        required: true
+        default: x64
+        type: choice
+        options:
+          - x64
+          - ARM64
+
+jobs:
+  build-installer:
+    name: Publish AOT and package installer
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Setup Rust
+        shell: pwsh
+        run: |
+          rustup show
+          rustup target add x86_64-pc-windows-msvc
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { throw "ISCC.exe not found after install." }
+
+      - name: Restore
+        shell: pwsh
+        run: |
+          dotnet restore .\DeskBox.sln -p:Platform=${{ inputs.platform }}
+
+      - name: Publish Native AOT
+        shell: pwsh
+        run: |
+          .\scripts\publish-aot-retail.ps1 -Platform ${{ inputs.platform }}
+
+      - name: Compile installer
+        shell: pwsh
+        run: |
+          $platform = "${{ inputs.platform }}"
+          $rid = if ($platform -eq 'ARM64') { 'win-arm64' } else { 'win-x64' }
+          $publishDir = Join-Path $PWD ".artifacts\aot-retail\$rid\publish"
+          $iss = if ($platform -eq 'ARM64') { ".\installer\DeskBox.arm64.iss" } else { ".\installer\DeskBox.iss" }
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            /DDeskBoxNativeAot=1 `
+            /DDeskBoxBundledRuntime=1 `
+            "/DMyAppReleaseDir=$publishDir" `
+            $iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed with exit code $LASTEXITCODE" }
+          Get-ChildItem .\Output\*.exe | ForEach-Object {
+            Write-Host "Installer: $($_.FullName) ($([math]::Round($_.Length/1MB,1)) MB)"
+            (Get-FileHash $_.FullName -Algorithm SHA256).Hash | Set-Content "$($_.FullName).sha256" -Encoding utf8
+          }
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeskBox-Installer-${{ inputs.platform }}
+          if-no-files-found: error
+          path: |
+            Output/*.exe
+            Output/*.sha256
+
+      - name: Upload publish log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-log
+          if-no-files-found: ignore
+          path: .artifacts/aot-retail/**/publish.log

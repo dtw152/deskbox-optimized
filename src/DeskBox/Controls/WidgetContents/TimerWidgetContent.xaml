@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="DeskBox.Controls.WidgetContents.TimerWidgetContent"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    AutomationProperties.Name="计时器"
+    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+    IsTabStop="True"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <Style x:Key="TimerPresetButtonStyle" TargetType="Button">
+            <Setter Property="MinWidth" Value="44" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="CornerRadius" Value="{StaticResource WidgetCornerRadiusSmall}" />
+            <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="TimerPrimaryButtonStyle" TargetType="Button">
+            <Setter Property="MinWidth" Value="104" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="CornerRadius" Value="{StaticResource WidgetCornerRadiusSmall}" />
+            <Setter Property="Background" Value="{ThemeResource AccentFillColorDefaultBrush}" />
+            <Setter Property="Foreground" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="TimerSecondaryButtonStyle" TargetType="Button">
+            <Setter Property="MinWidth" Value="76" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="CornerRadius" Value="{StaticResource WidgetCornerRadiusSmall}" />
+            <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Padding="16,14,16,16" RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Countdown readout -->
+        <StackPanel
+            Grid.Row="0"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Spacing="2">
+            <TextBlock
+                HorizontalAlignment="Center"
+                AutomationProperties.Name="剩余时间"
+                FontSize="44"
+                FontWeight="SemiBold"
+                IsTextScaleFactorEnabled="False"
+                Text="{Binding TimeText}"
+                TextAlignment="Center" />
+            <TextBlock
+                HorizontalAlignment="Center"
+                FontSize="12"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="{Binding StateText}"
+                TextAlignment="Center" />
+            <TextBlock
+                HorizontalAlignment="Center"
+                FontSize="11"
+                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                Text="{Binding DurationText}"
+                TextAlignment="Center" />
+        </StackPanel>
+
+        <ProgressBar
+            Grid.Row="1"
+            Height="4"
+            VerticalAlignment="Center"
+            Background="{ThemeResource ControlFillColorSecondaryBrush}"
+            Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+            Maximum="1"
+            Minimum="0"
+            Value="{Binding ProgressValue, Mode=OneWay}" />
+
+        <!-- Transport -->
+        <StackPanel
+            Grid.Row="2"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="8">
+            <Button
+                AutomationProperties.Name="开始或暂停计时"
+                Click="Primary_Click"
+                Style="{StaticResource TimerPrimaryButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <FontIcon FontSize="13" Glyph="{Binding PrimaryButtonGlyph}" />
+                    <TextBlock FontSize="13" Text="{Binding PrimaryButtonText}" />
+                </StackPanel>
+            </Button>
+            <Button
+                AutomationProperties.Name="重置计时器"
+                Click="Reset_Click"
+                IsEnabled="{Binding CanReset, Mode=OneWay}"
+                Style="{StaticResource TimerSecondaryButtonStyle}">
+                <TextBlock FontSize="13" Text="重置" />
+            </Button>
+        </StackPanel>
+
+        <!-- Presets -->
+        <StackPanel
+            Grid.Row="3"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="6">
+            <Button Click="Preset_Click" Content="1 分" Style="{StaticResource TimerPresetButtonStyle}" Tag="1" />
+            <Button Click="Preset_Click" Content="5 分" Style="{StaticResource TimerPresetButtonStyle}" Tag="5" />
+            <Button Click="Preset_Click" Content="10 分" Style="{StaticResource TimerPresetButtonStyle}" Tag="10" />
+            <Button Click="Preset_Click" Content="25 分" Style="{StaticResource TimerPresetButtonStyle}" Tag="25" />
+        </StackPanel>
+    </Grid>
+</UserControl>
