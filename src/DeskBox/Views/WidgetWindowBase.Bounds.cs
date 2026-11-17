@@ -850,9 +850,7 @@ public abstract partial class WidgetWindowBase
             UpdateCustomPanoramaViewport();
             if (args.DidSizeChange)
             {
-                ApplyWindowCornerRegion(
-                    WindowsCompatibilityService.ResolveEffectiveWidgetCornerPreference(
-                        SettingsService.Settings.WidgetCornerPreference));
+                ApplyWindowCornerRegion(GetCornerRadiusFromPreference());
             }
         }
 
@@ -914,7 +912,7 @@ public abstract partial class WidgetWindowBase
         }
 
         Win32Helper.TrySetDwmWindowAttribute(HWnd, Win32Helper.DWMWA_WINDOW_CORNER_PREFERENCE, ref cornerPreference);
-        ApplyWindowCornerRegion(effectivePreference);
+        ApplyWindowCornerRegion(surfaceRadius);
     }
 
     /// <summary>
@@ -924,19 +922,13 @@ public abstract partial class WidgetWindowBase
     /// so the requested radius (including the custom slider) is visible on
     /// every supported Windows version.
     /// </summary>
-    private void ApplyWindowCornerRegion(string effectivePreference)
+    private void ApplyWindowCornerRegion(double radiusDip)
     {
         if (WindowsCompatibilityService.SupportsNativeWindowCorners || HWnd == IntPtr.Zero)
         {
             return;
         }
 
-        double radiusDip = string.Equals(
-            effectivePreference,
-            SettingsService.WidgetCornerPreferenceSquare,
-            StringComparison.Ordinal)
-            ? 0
-            : GetCornerRadiusFromPreference();
         double scale = _observedRasterizationScale > 0 ? _observedRasterizationScale : 1.0;
         int ellipseSize = (int)Math.Round(radiusDip * scale * 2);
 
