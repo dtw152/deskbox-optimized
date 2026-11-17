@@ -78,7 +78,7 @@ public sealed class TimerWidgetViewModel : ObservableObject, IDisposable
         _tickTimer.Tick += TickTimer_Tick;
     }
 
-    public ObservableCollection<string> Laps { get; } = [];
+    public ObservableCollection<string> Laps { get; } = new();
 
     /// <summary>Countdown text (mm:ss or h:mm:ss) or stopwatch elapsed time.</summary>
     public string TimeText => _mode == TimerWidgetMode.Countdown
